@@ -21,23 +21,26 @@ class App extends Component {
 	}
 
 	videoSearch(term) {
-		//load default videos using YTSearch
-		YTSearch({ key: API_KEY, term: term }, videos => {
-			this.setState({
-				videos: videos,
-				selectedVideo: videos[0],
+		if (term.length > 0) {
+			//load default videos using YTSearch
+			YTSearch({ key: API_KEY, term: term }, videos => {
+				this.setState({
+					videos: videos,
+					selectedVideo: videos[0],
+				});
 			});
-		});
+		}
 	}
 
 	render() {
+		//Add throttling to search video for 0.4s
+		const videoSearch = _.debounce(term => {
+			this.videoSearch(term);
+		}, 400);
+
 		return (
 			<div>
-				<SearchBar
-					onSearchTermChange={term => {
-						this.videoSearch(term);
-					}}
-				/>
+				<SearchBar onSearchTermChange={videoSearch} />
 				<VideoDetail video={this.state.selectedVideo} />
 				<VideoList
 					videos={this.state.videos}
